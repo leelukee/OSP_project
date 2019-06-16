@@ -1,12 +1,30 @@
-{% extends 'layout.html' %}
+{% extends 'input.html' %}
 
 {% block content %}
 <div>
-	{% for url in url_list %}
+<!--	{% for url in url_list %}
 	<br>
 	{{url}}
 	<br>
 	{% endfor %}
+-->
+
+<table border = 1>
+	<th>URL</th>
+	<th>word count(including duplicates)</th>
+	<th>word count(no duplicates)</th>
+	<th>processing time</th>
+	
+	{% for i in range(0, (url_list |length) , 1) %}
+		
+	<tr>
+		<td> {{ url_list[i] }}</td>
+		<td> {{ craw_list[i]['count'] }}</td>
+		<td> {{ craw_list[i]['count2'] }}</td>
+		<td> {{ craw_list[i]['time'] }}</td>
+	</tr>
+	{% endfor %}
+</table>	
 </div>
 
 {% endblock %}

@@ -3,7 +3,10 @@
 {% block content %}
 
 <div>
-	<br>accepted url data : {{url}}<br>
+	<br>url data : {{url}}<br>
+	word count(including duplicates) : {{crw['count']}}<br>
+	word count(no duplicates) : {{crw['count2']}}<br>
+	processing time : {{crw['time']}}<br>
 </div>
 
 {% endblock %}	
