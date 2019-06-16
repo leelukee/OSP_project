@@ -1,9 +1,12 @@
-<html>
-	<body>
-		{% for url in url_list %}
-		<br>
-		{{url}}
-		<br>
-		{% endfor %}
-	</body>
-</html>
+{% extends 'layout.html' %}
+
+{% block content %}
+<div>
+	{% for url in url_list %}
+	<br>
+	{{url}}
+	<br>
+	{% endfor %}
+</div>
+
+{% endblock %}
