@@ -24,7 +24,10 @@ app = Flask(__name__)
 url_list = [] #crawling한 url 저장
 craw_list = [] #crawling된 정보 저장
 
-def web_crawling(url, id_count):
+#저장된 문서 개수
+id_count = 0
+
+def web_crawling(url):
 	
 	start = time.time()
 
@@ -58,7 +61,8 @@ def web_crawling(url, id_count):
 		"count2" : count2,
 		"time" : time_check,
 	}
-
+	global id_count 
+	id_count = id_count + 1
 	es.index(index="pe", doc_type="ex", id=id_count, body=doc)
 
 @app.route('/')
@@ -72,9 +76,9 @@ def crawl_url():
 		url = request.form['URL']
 		#input html에서 URL을 받아옴 
 		url_list.append(url)		
-		web_crawling(url, 1)
+		web_crawling(url)
 
-		res = es.get(index="pe", doc_type="ex", id=1)
+		res = es.get(index="pe", doc_type="ex", id=id_count)
 		
 		d = {}
 		
@@ -98,14 +102,14 @@ def txt_url():
 		#test_txt폴더에 있는 txt파일들중 이름이 같은 파일을 찾아서 파일을 연다
 		f = open("./test_txt/"+txt+".txt",'r')
 		#거기에 있는 URL을 list로 받음
-		id_count = 1
 		while True:
 			line = f.readline()
 			if not line: break
 			
 			url_list.append(line)
+			global id_count 
 			id_count = id_count + 1	
-			web_crawling(line, id_count)
+			web_crawling(line)
 
 			res = es.get(index="pe", doc_type="ex", id=id_count)
 
@@ -126,8 +130,6 @@ def txt_url():
 
 if __name__ == '__main__':
     	try:
-		#저장된 문서 개수
-		#id_count = 0
         	parser = argparse.ArgumentParser(description="")
         	parser.add_argument('--listen-port',  type=str, required=True, help='REST service listen port')
         	args = parser.parse_args()
