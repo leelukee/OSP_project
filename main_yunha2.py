@@ -21,7 +21,6 @@ es = Elasticsearch([{'host':elasticsearch_host, 'port':elasticsearch_port}], tim
 
 app = Flask(__name__)
 
-url_list = [] #crawling한 url 저장
 craw_list = [] #crawling된 정보 저장
 
 #저장된 문서 개수
@@ -61,9 +60,11 @@ def web_crawling(url):
 		"count2" : count2,
 		"time" : time_check,
 	}
+
 	global id_count 
 	id_count = id_count + 1
-	es.index(index="pe", doc_type="ex", id=id_count, body=doc)
+		
+	es.index(index="xx", doc_type="ex", id=id_count, body=doc)
 
 @app.route('/')
 def main():
@@ -74,58 +75,52 @@ def main():
 def crawl_url():
 	if request.method == 'POST':
 		url = request.form['URL']
+		cnt = id_count
 		#input html에서 URL을 받아옴 
-		url_list.append(url)		
 		web_crawling(url)
 
-		res = es.get(index="pe", doc_type="ex", id=id_count)
-		
-		d = {}
-		
-		d['words'] = res['_source']['words']
-		d['count'] = res['_source']['count']
-		d['count2'] = res['_source']['count2']
-		d['time'] = res['_source']['time']
+		for i in range(cnt+1, id_count+1, 1):
+			res = es.get(index="xx", doc_type="ex", id=i)
+			d={}
+			d['url'] = res['_source']['url']
+			d['words'] = res['_source']['words']
+			d['count'] = res['_source']['count']
+			d['count2'] = res['_source']['count2']
+			d['time'] = res['_source']['time']
 
-		craw_list.append(d)
-
+			craw_list.append(d)
+			
 		#crawl 결과를 output.html로 리턴 
-		return render_template('txtout.html', url_list = url_list, craw_list = craw_list)
+		return render_template('txtout.html', craw_list = craw_list)
 	
 @app.route('/txt_url',methods = ['POST','GET'])
 def txt_url():
 	if request.method == 'POST':
 		#text file이름을 받아옴
 		txt=request.form['textname']
-		#url_list= []
-
 		#test_txt폴더에 있는 txt파일들중 이름이 같은 파일을 찾아서 파일을 연다
 		f = open("./test_txt/"+txt+".txt",'r')
 		#거기에 있는 URL을 list로 받음
+		cnt = id_count
 		while True:
 			line = f.readline()
-			if not line: break
-			
-			url_list.append(line)
-			global id_count 
-			id_count = id_count + 1	
+			if not line: break		
 			web_crawling(line)
+		for i in range(cnt+1, id_count+1, 1):	
+			res = es.get(index="xx", doc_type="ex", id=i)
 
-			res = es.get(index="pe", doc_type="ex", id=id_count)
-
-               		d = {}
-
+			d={}
+			d['url'] = res['_source']['url']
                 	d['words'] = res['_source']['words']
                 	d['count'] = res['_source']['count']
                 	d['count2'] = res['_source']['count2']
                 	d['time'] = res['_source']['time']
 					
 			craw_list.append(d)
-		
+
 		f.close()
 		#url리스트들을 txtout.html로 넘김
-		return render_template('txtout.html', url_list = url_list, craw_list = craw_list)
-
+		return render_template('txtout.html', craw_list = craw_list)
 
 
 if __name__ == '__main__':
