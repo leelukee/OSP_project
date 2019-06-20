@@ -1,0 +1,24 @@
+{% extends 'input.html' %}
+
+{% block content %}
+
+<table border = 1>
+        <th>URL</th>
+        <th>word count(including duplicates)</th>
+        <th>word count(no duplicates)</th>
+        <th>processing time</th>
+
+        {% for i in range(1, id_count+1, 1) %}
+
+        <tr>
+                <td> {{ url_list[i] }}</td>
+                <td> {{ craw_list[i]['count'] }}</td>
+                <td> {{ craw_list[i]['count2'] }}</td>
+                <td> {{ craw_list[i]['time'] }}</td>
+        </tr>
+        {% endfor %}
+</table>
+</div>
+
+{% endblock %}
+
